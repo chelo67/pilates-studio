@@ -24,16 +24,6 @@ const AdminDashboard = () => {
 
     return (
         <div className="dash-page">
-            {/* Mobile Hamburger */}
-            <button className="dash-hamburger" onClick={toggleSidebar}>
-                {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-
-            {/* Sidebar Overlay */}
-            <div
-                className={`dash-sidebar-overlay ${isSidebarOpen ? 'open' : ''}`}
-                onClick={() => setIsSidebarOpen(false)}
-            />
 
             <div className="dash-layout">
                 {/* Sidebar */}
@@ -181,6 +171,15 @@ const AdminDashboard = () => {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onSuccess={handleClassCreated}
+            />
+
+            {/* Mobile Navigation Elements (at the bottom to ensure top stacking order) */}
+            <button className="dash-hamburger" onClick={toggleSidebar}>
+                {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+            <div
+                className={`dash-sidebar-overlay ${isSidebarOpen ? 'open' : ''}`}
+                onClick={() => setIsSidebarOpen(false)}
             />
         </div>
     );

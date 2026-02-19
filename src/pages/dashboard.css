@@ -24,20 +24,12 @@
     z-index: 0;
 }
 
-.dash-page>* {
-    position: relative;
-    /* Removed z-index: 1; to avoid layering issues with fixed elements */
-}
-
-/* Base layer for content to ensure it stays above background but below menus */
-.dash-layout {
-    position: relative;
-    z-index: 10;
-}
-
-/* Hamburger button - must be above everything else */
+/* Ensure mobile toggle is always findable and clickable */
 .dash-hamburger {
-    z-index: 200 !important;
+    position: fixed !important;
+    z-index: 999999 !important;
+    pointer-events: auto !important;
+    isolation: isolate;
 }
 
 /* ---------- Navbar ---------- */
@@ -945,8 +937,8 @@
     top: 0;
     left: 0;
     bottom: 0;
-    z-index: 9998;
-    /* Just below hamburger */
+    z-index: 999995;
+    /* Between overlay and hamburger */
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -1138,24 +1130,26 @@
 .dash-hamburger {
     display: none;
     position: fixed;
-    top: 1rem;
-    left: 1rem;
-    width: 3.25rem;
+    top: 1.25rem;
+    left: 1.25rem;
+    width: 3.5rem;
     /* Larger touch target */
-    height: 3.25rem;
-    border-radius: 0.75rem;
-    background: #2d1b69;
-    /* Solid background to avoid 'blur' issues */
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    color: #fff;
+    height: 3.5rem;
+    border-radius: 1rem;
+    background: #4c1d95 !important;
+    /* Solid vibrant purple */
+    border: 2px solid rgba(255, 255, 255, 0.3) !important;
+    color: #fff !important;
     cursor: pointer;
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-    z-index: 9999 !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+    z-index: 999999 !important;
     /* Ensure it's above EVERYTHING */
     padding: 0;
+    margin: 0;
+    outline: none;
     -webkit-tap-highlight-color: transparent;
 }
 
@@ -1168,9 +1162,12 @@
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.7);
-    /* Darker overlay, no blur for performance/compatibility */
-    z-index: 9997;
+    background: rgba(0, 0, 0, 0.82);
+    /* Solid dark overlay */
+    z-index: 999990;
+    /* Just below hamburger */
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
 }
 
 /* ---------- Responsive sidebar ---------- */
