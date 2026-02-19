@@ -343,7 +343,7 @@ const MemberSchedule = () => {
                                             const checkDate = new Date(`${cls.class_date}T${cls.start_time}`);
                                             const now = new Date();
                                             const isPast = isAfter(now, checkDate);
-                                            const isFull = cls.reservation_count >= cls.max_capacity;
+                                            const isFull = (cls.reservation_count || 0) >= cls.max_capacity;
                                             const isBooked = cls.user_reservation;
 
                                             return (
