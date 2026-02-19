@@ -29,6 +29,11 @@
     z-index: 1;
 }
 
+/* Ensure hamburger is always on top */
+.dash-hamburger {
+    z-index: 100 !important;
+}
+
 /* ---------- Navbar ---------- */
 .dash-navbar {
     background: rgba(255, 255, 255, 0.06);
@@ -935,7 +940,7 @@
     top: 0;
     left: 0;
     bottom: 0;
-    z-index: 50;
+    z-index: 90;
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -1153,8 +1158,10 @@
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 45;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 80;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
 }
 
 /* ---------- Responsive sidebar ---------- */
