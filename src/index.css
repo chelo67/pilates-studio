@@ -1,0 +1,13 @@
+@import url('./pages/auth/auth.css');
+@import url('./pages/dashboard.css');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
