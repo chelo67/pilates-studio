@@ -26,12 +26,18 @@
 
 .dash-page>* {
     position: relative;
-    z-index: 1;
+    /* Removed z-index: 1; to avoid layering issues with fixed elements */
 }
 
-/* Ensure hamburger is always on top */
+/* Base layer for content to ensure it stays above background but below menus */
+.dash-layout {
+    position: relative;
+    z-index: 10;
+}
+
+/* Hamburger button - must be above everything else */
 .dash-hamburger {
-    z-index: 100 !important;
+    z-index: 200 !important;
 }
 
 /* ---------- Navbar ---------- */
@@ -940,7 +946,8 @@
     top: 0;
     left: 0;
     bottom: 0;
-    z-index: 90;
+    z-index: 180;
+    /* Between overlay (150) and hamburger (200) */
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -1134,19 +1141,20 @@
     position: fixed;
     top: 1rem;
     left: 1rem;
-    z-index: 60;
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 0.5rem;
-    background: rgba(124, 58, 237, 0.3);
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 0.65rem;
+    background: rgba(45, 27, 105, 0.85);
+    /* Darker solid color for better contrast */
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(124, 58, 237, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     color: #fff;
     cursor: pointer;
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 .dash-hamburger:hover {
@@ -1158,10 +1166,11 @@
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.4);
-    z-index: 80;
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 150;
+    /* Above layout (10) but below hamburger (200) and sidebar (180) */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 }
 
 /* ---------- Responsive sidebar ---------- */
