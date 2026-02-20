@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase';
 import { X, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { useToast } from '../../components/ui/Toast';
+import { getCurrentTenantId } from '../../lib/tenant';
 
 interface ClassReservationsModalProps {
     classId: string | null;
@@ -19,13 +20,14 @@ const ClassReservationsModal = ({ classId, onClose }: ClassReservationsModalProp
         if (!classId) return;
         setLoading(true);
 
-        const { data: cls } = await supabase.from('classes').select('title, class_date, start_time').eq('id', classId).single();
+        const { data: cls } = await supabase.from('classes').select('title, class_date, start_time').eq('id', classId).eq('tenant_id', getCurrentTenantId()).single();
         if (cls) setClassName(`${cls.title} (${format(new Date(cls.class_date), 'dd MMM')} ${cls.start_time.slice(0, 5)})`);
 
         const { data, error } = await supabase
             .from('reservations')
             .select('*, profiles(full_name)')
-            .eq('class_id', classId);
+            .eq('class_id', classId)
+            .eq('tenant_id', getCurrentTenantId());
 
         if (error) console.error(error);
         else setReservations(data || []);
@@ -47,7 +49,11 @@ const ClassReservationsModal = ({ classId, onClose }: ClassReservationsModalProp
         });
         if (!confirmed) return;
 
-        const { error } = await supabase.from('reservations').delete().eq('id', reservationId);
+        const { error } = await supabase
+            .from('reservations')
+            .update({ status: 'cancelled' })
+            .eq('id', reservationId)
+            .eq('tenant_id', getCurrentTenantId());
         if (error) {
             toast.error(error.message);
         } else {
@@ -106,6 +112,7 @@ const ClassReservationsModal = ({ classId, onClose }: ClassReservationsModalProp
                                                     onClick={() => handleCancel(res.id)}
                                                     className="dash-icon-btn dash-icon-btn-red"
                                                     title="Cancelar reserva"
+                                                    disabled={res.status === 'cancelled'}
                                                 >
                                                     <Trash2 size={16} />
                                                 </button>

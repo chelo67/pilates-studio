@@ -5,6 +5,8 @@ import { format } from 'date-fns';
 import { Calendar, Clock, Users, LogOut, Menu, X } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useToast } from '../../components/ui/Toast';
+import { getCurrentTenantId } from '../../lib/tenant';
+import NotificationBell from '../../components/NotificationBell';
 
 const MemberReservations = () => {
     const { user, signOut } = useAuth();
@@ -20,6 +22,7 @@ const MemberReservations = () => {
             .from('reservations')
             .select('*, classes(*)')
             .eq('user_id', user?.id)
+            .eq('tenant_id', getCurrentTenantId())
             .order('created_at', { ascending: false });
 
         if (error) {
@@ -46,9 +49,11 @@ const MemberReservations = () => {
 
         const { error } = await supabase
             .from('reservations')
-            .delete()
+            .update({ status: 'cancelled' })
             .eq('class_id', classId)
-            .eq('user_id', user?.id);
+            .eq('user_id', user?.id)
+            .eq('status', 'active')
+            .eq('tenant_id', getCurrentTenantId());
 
         if (error) {
             toast.error(error.message);
@@ -119,9 +124,12 @@ const MemberReservations = () => {
                 {/* Content Area */}
                 <div className="dash-content">
                     <main className="dash-content-inner">
-                        <div className="dash-header">
-                            <h1 className="dash-title">Mis Reservas</h1>
-                            <p className="dash-subtitle">Historial de tus reservas de clases</p>
+                        <div className="dash-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                            <div>
+                                <h1 className="dash-title">Mis Reservas</h1>
+                                <p className="dash-subtitle">Historial de tus reservas de clases</p>
+                            </div>
+                            <NotificationBell />
                         </div>
 
                         {loading ? (

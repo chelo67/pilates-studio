@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { format } from 'date-fns';
 import { Trash2, Users } from 'lucide-react';
+import { getCurrentTenantId } from '../../lib/tenant';
 import ClassReservationsModal from './ClassReservationsModal';
 import { useToast } from '../../components/ui/Toast';
 
@@ -12,7 +13,10 @@ interface ClassItem {
     start_time: string;
     end_time: string;
     max_capacity: number;
-    reservations: any[];
+    reservation_count?: number;
+    instructor?: { name: string } | null;
+    instructor_name?: string;
+    status: 'active' | 'closed' | 'cancelled';
 }
 
 const AdminClassList = () => {
@@ -23,16 +27,34 @@ const AdminClassList = () => {
 
     const fetchClasses = async () => {
         setLoading(true);
-        const { data, error } = await supabase
+        const { data: classesData, error } = await supabase
             .from('classes')
-            .select('*, reservations(count)')
+            .select('*, instructor:instructors(name)')
+            .eq('tenant_id', getCurrentTenantId())
             .order('class_date', { ascending: true })
             .order('start_time', { ascending: true });
 
         if (error) {
             console.error('Error fetching classes:', error);
         } else {
-            setClasses(data || []);
+            // Fetch active counts
+            const { data: resData } = await supabase
+                .from('reservations')
+                .select('class_id')
+                .eq('status', 'active')
+                .eq('tenant_id', getCurrentTenantId());
+
+            const countMap = new Map<string, number>();
+            resData?.forEach(r => {
+                countMap.set(r.class_id, (countMap.get(r.class_id) || 0) + 1);
+            });
+
+            const merged = classesData?.map(c => ({
+                ...c,
+                reservation_count: countMap.get(c.id) || 0
+            })) || [];
+
+            setClasses(merged);
         }
         setLoading(false);
     };
@@ -51,11 +73,30 @@ const AdminClassList = () => {
         });
         if (!confirmed) return;
 
-        const { error } = await supabase.from('classes').delete().eq('id', id);
+        const { error } = await supabase
+            .from('classes')
+            .delete()
+            .eq('id', id)
+            .eq('tenant_id', getCurrentTenantId());
         if (error) {
             toast.error(error.message);
         } else {
             toast.success('Clase eliminada correctamente.');
+            fetchClasses();
+        }
+    };
+
+    const handleUpdateStatus = async (id: string, newStatus: string) => {
+        const { error } = await supabase
+            .from('classes')
+            .update({ status: newStatus })
+            .eq('id', id)
+            .eq('tenant_id', getCurrentTenantId());
+
+        if (error) {
+            toast.error(error.message);
+        } else {
+            toast.success(`Estado actualizado a ${newStatus}`);
             fetchClasses();
         }
     };
@@ -76,8 +117,9 @@ const AdminClassList = () => {
                     <thead>
                         <tr>
                             <th>Fecha y Hora</th>
-                            <th>Título</th>
+                            <th>Clase / Instructor</th>
                             <th>Capacidad</th>
+                            <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -95,8 +137,13 @@ const AdminClassList = () => {
                                         {cls.start_time.slice(0, 5)} - {cls.end_time.slice(0, 5)}
                                     </div>
                                 </td>
-                                <td data-label="Título" style={{ fontWeight: 500, color: 'rgba(255,255,255,0.95)' }}>
-                                    {cls.title}
+                                <td data-label="Título">
+                                    <div style={{ fontWeight: 500, color: 'rgba(255,255,255,0.95)' }}>
+                                        {cls.title}
+                                    </div>
+                                    <div className="dash-table-sub" style={{ fontSize: '0.8rem' }}>
+                                        {cls.instructor?.name || cls.instructor_name || 'Sin instructor'}
+                                    </div>
                                 </td>
                                 <td data-label="Capacidad">
                                     <button
@@ -106,11 +153,63 @@ const AdminClassList = () => {
                                         title="Ver lista de inscritos"
                                     >
                                         <Users size={12} />
-                                        {cls.reservations?.[0]?.count || 0} / {cls.max_capacity}
+                                        {cls.reservation_count || 0} / {cls.max_capacity}
                                     </button>
+                                </td>
+                                <td data-label="Estado">
+                                    {cls.status === 'active' && <span className="dash-badge dash-badge-green">Disponible</span>}
+                                    {cls.status === 'closed' && <span className="dash-badge dash-badge-blue">Cerrada</span>}
+                                    {cls.status === 'cancelled' && <span className="dash-badge dash-badge-red">Cancelada</span>}
                                 </td>
                                 <td data-label="Acciones">
                                     <div style={{ display: 'flex', gap: '0.25rem', justifyContent: 'flex-end' }}>
+                                        {/* Dynamic Action Buttons */}
+                                        {cls.status === 'active' && (
+                                            <>
+                                                <button
+                                                    onClick={() => handleUpdateStatus(cls.id, 'closed')}
+                                                    className="dash-icon-btn dash-icon-btn-blue"
+                                                    title="Cerrar Reservas"
+                                                >
+                                                    <span style={{ fontSize: '0.7rem' }}>🔒</span>
+                                                </button>
+                                                <button
+                                                    onClick={() => handleUpdateStatus(cls.id, 'cancelled')}
+                                                    className="dash-icon-btn dash-icon-btn-red"
+                                                    title="Cancelar Clase"
+                                                >
+                                                    <span style={{ fontSize: '0.7rem' }}>🚫</span>
+                                                </button>
+                                            </>
+                                        )}
+                                        {cls.status === 'closed' && (
+                                            <>
+                                                <button
+                                                    onClick={() => handleUpdateStatus(cls.id, 'active')}
+                                                    className="dash-icon-btn dash-icon-btn-blue"
+                                                    title="Reabrir Reservas"
+                                                >
+                                                    <span style={{ fontSize: '0.7rem' }}>🔓</span>
+                                                </button>
+                                                <button
+                                                    onClick={() => handleUpdateStatus(cls.id, 'cancelled')}
+                                                    className="dash-icon-btn dash-icon-btn-red"
+                                                    title="Cancelar Clase"
+                                                >
+                                                    <span style={{ fontSize: '0.7rem' }}>🚫</span>
+                                                </button>
+                                            </>
+                                        )}
+                                        {cls.status === 'cancelled' && (
+                                            <button
+                                                onClick={() => handleUpdateStatus(cls.id, 'active')}
+                                                className="dash-icon-btn dash-icon-btn-blue"
+                                                title="Reactivar Clase"
+                                            >
+                                                <span style={{ fontSize: '0.7rem' }}>🔄</span>
+                                            </button>
+                                        )}
+
                                         <button
                                             onClick={() => setSelectedClassId(cls.id)}
                                             className="dash-icon-btn dash-icon-btn-blue"

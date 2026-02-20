@@ -18,6 +18,8 @@ import { es } from 'date-fns/locale';
 import { Calendar as CalendarIcon, Clock, Users, LogOut, Menu, X, ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useToast } from '../../components/ui/Toast';
+import { getCurrentTenantId } from '../../lib/tenant';
+import NotificationBell from '../../components/NotificationBell';
 
 interface ClassItem {
     id: string;
@@ -30,6 +32,9 @@ interface ClassItem {
     reservations: { count: number }[];
     user_reservation?: boolean;
     reservation_count?: number;
+    instructor?: { name: string } | null;
+    instructor_name?: string;
+    status: 'active' | 'closed' | 'cancelled';
 }
 
 const MemberSchedule = () => {
@@ -58,6 +63,7 @@ const MemberSchedule = () => {
         const { data: classesData } = await supabase
             .from('classes')
             .select('class_date')
+            .eq('tenant_id', getCurrentTenantId())
             .gte('class_date', start)
             .lte('class_date', end);
 
@@ -70,6 +76,7 @@ const MemberSchedule = () => {
             .from('reservations')
             .select('classes(class_date)')
             .eq('user_id', user.id)
+            .eq('tenant_id', getCurrentTenantId())
             .eq('status', 'active');
 
         if (resData) {
@@ -87,8 +94,9 @@ const MemberSchedule = () => {
 
         const { data: classesData, error: classesError } = await supabase
             .from('classes')
-            .select('*, reservations(count)')
+            .select('*, reservations(count), instructor:instructors(name)')
             .eq('class_date', dateStr)
+            .eq('tenant_id', getCurrentTenantId())
             .order('start_time', { ascending: true });
 
         if (classesError) {
@@ -97,17 +105,33 @@ const MemberSchedule = () => {
             return;
         }
 
+        // Fetch my reservations (active) to show "Inscrito"
         const { data: myReservations } = await supabase
             .from('reservations')
             .select('class_id')
             .eq('user_id', user?.id)
+            .eq('tenant_id', getCurrentTenantId())
             .eq('status', 'active');
 
         const bookedClassIds = new Set(myReservations?.map(r => r.class_id));
 
+        // Fetch ALL active reservations for these classes to calculate occupancy accurately
+        // We do this by selecting status from reservations and filtering locally
+        const { data: allResData } = await supabase
+            .from('reservations')
+            .select('class_id, status')
+            .in('class_id', classesData?.map(c => c.id) || [])
+            .eq('status', 'active')
+            .eq('tenant_id', getCurrentTenantId());
+
+        const resCountMap = new Map<string, number>();
+        allResData?.forEach(r => {
+            resCountMap.set(r.class_id, (resCountMap.get(r.class_id) || 0) + 1);
+        });
+
         const mergedData = classesData?.map(cls => ({
             ...cls,
-            reservation_count: cls.reservations?.[0]?.count || 0,
+            reservation_count: resCountMap.get(cls.id) || 0,
             user_reservation: bookedClassIds.has(cls.id)
         })) || [];
 
@@ -130,14 +154,42 @@ const MemberSchedule = () => {
     const handleBook = async (classId: string) => {
         setBookingId(classId);
         try {
-            const { error } = await supabase
-                .from('reservations')
-                .insert([{ class_id: classId, user_id: user?.id }]);
+            const { data, error } = await supabase.rpc('book_class', {
+                p_class_id: classId,
+                p_user_id: user?.id,
+                p_tenant_id: getCurrentTenantId()
+            });
+
             if (error) throw error;
-            toast.success('¡Clase reservada exitosamente!');
-            fetchClassesForDay(selectedDate);
-            fetchMonthIndicators();
+
+            switch (data) {
+                case 'SUCCESS':
+                    toast.success('¡Clase reservada exitosamente!');
+                    fetchClassesForDay(selectedDate);
+                    fetchMonthIndicators();
+                    break;
+                case 'CLASS_FULL':
+                    toast.error('La clase se llenó mientras intentabas reservar. Intenta otra clase.');
+                    fetchClassesForDay(selectedDate);
+                    break;
+                case 'CLASS_NOT_ACTIVE':
+                    toast.error('La clase ya no está disponible para nuevas reservas.');
+                    fetchClassesForDay(selectedDate);
+                    break;
+                case 'ALREADY_BOOKED':
+                    toast.error('Ya tienes una reserva activa para esta clase.');
+                    break;
+                case 'CLASS_NOT_FOUND':
+                    toast.error('No se encontró la clase especificada.');
+                    break;
+                default:
+                    if (data && data.startsWith('ERROR:')) {
+                        throw new Error(data);
+                    }
+                    toast.error('Hubo un problema al procesar tu reserva.');
+            }
         } catch (error: any) {
+            console.error('Booking error:', error);
             toast.error(error.message || 'Error al reservar');
         } finally {
             setBookingId(null);
@@ -157,9 +209,11 @@ const MemberSchedule = () => {
         try {
             const { error } = await supabase
                 .from('reservations')
-                .delete()
+                .update({ status: 'cancelled' })
                 .eq('class_id', classId)
-                .eq('user_id', user?.id);
+                .eq('user_id', user?.id)
+                .eq('tenant_id', getCurrentTenantId())
+                .eq('status', 'active');
             if (error) throw error;
             toast.success('Reserva cancelada correctamente.');
             fetchClassesForDay(selectedDate);
@@ -253,9 +307,12 @@ const MemberSchedule = () => {
                 {/* Content Area */}
                 <div className="dash-content">
                     <main className="dash-content-inner">
-                        <div className="dash-header">
-                            <h1 className="dash-title">Horarios de Clases</h1>
-                            <p className="dash-subtitle">Navegá el calendario para encontrar y reservar tus clases</p>
+                        <div className="dash-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                            <div>
+                                <h1 className="dash-title">Horarios de Clases</h1>
+                                <p className="dash-subtitle">Navegá el calendario para encontrar y reservar tus clases</p>
+                            </div>
+                            <NotificationBell />
                         </div>
 
                         <div className="member-sched-layout">
@@ -343,6 +400,10 @@ const MemberSchedule = () => {
                                                             <h3 className="dash-class-card-title">{cls.title}</h3>
                                                             {isBooked ? (
                                                                 <span className="dash-badge dash-badge-green">Reservada</span>
+                                                            ) : cls.status === 'cancelled' ? (
+                                                                <span className="dash-badge dash-badge-red">Cancelada</span>
+                                                            ) : cls.status === 'closed' ? (
+                                                                <span className="dash-badge dash-badge-blue">Cerrada</span>
                                                             ) : isFull ? (
                                                                 <span className="dash-badge dash-badge-red">Completa</span>
                                                             ) : (
@@ -351,6 +412,13 @@ const MemberSchedule = () => {
                                                         </div>
 
                                                         <p className="dash-class-card-desc">{cls.description}</p>
+
+                                                        <div className="dash-class-meta" style={{ marginBottom: '0.5rem' }}>
+                                                            <div className="dash-class-meta-item" style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.85rem' }}>
+                                                                <Users size={14} />
+                                                                Prof: {cls.instructor?.name || cls.instructor_name || 'Sin especificar'}
+                                                            </div>
+                                                        </div>
 
                                                         <div className="dash-class-meta">
                                                             <div className="dash-class-meta-item">
@@ -376,10 +444,13 @@ const MemberSchedule = () => {
                                                         ) : (
                                                             <button
                                                                 onClick={() => handleBook(cls.id)}
-                                                                disabled={bookingId === cls.id || isFull || isPast}
-                                                                className={`dash-book-btn ${isFull ? 'dash-book-btn-full' : 'dash-book-btn-primary'}`}
+                                                                disabled={bookingId === cls.id || isFull || isPast || cls.status !== 'active'}
+                                                                className={`dash-book-btn ${isFull || cls.status !== 'active' ? 'dash-book-btn-full' : 'dash-book-btn-primary'}`}
                                                             >
-                                                                {bookingId === cls.id ? 'Reservando...' : (isFull ? 'Clase Completa' : 'Reservar')}
+                                                                {bookingId === cls.id ? 'Reservando...' :
+                                                                    cls.status === 'cancelled' ? 'Clase Cancelada' :
+                                                                        cls.status === 'closed' ? 'Reservas Cerradas' :
+                                                                            isFull ? 'Clase Completa' : 'Reservar'}
                                                             </button>
                                                         )}
                                                     </div>

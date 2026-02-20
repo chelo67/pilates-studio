@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Users, Activity, Calendar, TrendingUp, Plus, UserPlus } from 'lucide-react';
+import { getCurrentTenantId } from '../../lib/tenant';
 
 interface Stats {
     totalMembers: number;
@@ -49,10 +50,10 @@ const AdminOverview = ({ onNewMember, onNewClass }: AdminOverviewProps) => {
             { count: classes },
             { count: todayRes }
         ] = await Promise.all([
-            supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'member'),
-            supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'member').eq('active', true),
-            supabase.from('classes').select('*', { count: 'exact', head: true }).gte('class_date', today),
-            supabase.from('reservations').select('*, classes!inner(*)', { count: 'exact', head: true }).eq('classes.class_date', today)
+            supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'member').eq('tenant_id', getCurrentTenantId()),
+            supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'member').eq('active', true).eq('tenant_id', getCurrentTenantId()),
+            supabase.from('classes').select('*', { count: 'exact', head: true }).gte('class_date', today).eq('tenant_id', getCurrentTenantId()),
+            supabase.from('reservations').select('*, classes!inner(*)', { count: 'exact', head: true }).eq('classes.class_date', today).eq('tenant_id', getCurrentTenantId())
         ]);
 
         setStats({
@@ -71,6 +72,7 @@ const AdminOverview = ({ onNewMember, onNewClass }: AdminOverviewProps) => {
                 profiles(full_name),
                 classes(title, class_date)
             `)
+            .eq('tenant_id', getCurrentTenantId())
             .order('created_at', { ascending: false })
             .limit(5);
 

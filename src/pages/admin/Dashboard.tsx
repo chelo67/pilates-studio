@@ -5,13 +5,15 @@ import CreateClassModal from './CreateClassModal';
 import AdminMembers from './AdminMembers';
 import AdminOverview from './AdminOverview';
 import AdminReservations from './AdminReservations';
+import AdminInstructors from './AdminInstructors';
 import AdminCalendar from './AdminCalendar';
 import { Plus, Users, Calendar, LogOut, Menu, X, Activity, CalendarDays } from 'lucide-react';
+import NotificationBell from '../../components/NotificationBell';
 
 const AdminDashboard = () => {
     const { user, signOut } = useAuth();
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [activeTab, setActiveTab] = useState<'overview' | 'classes' | 'members' | 'reservations' | 'calendar'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'classes' | 'members' | 'reservations' | 'calendar' | 'instructors'>('overview');
     const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
     const [refreshKey, setRefreshKey] = useState(0);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -81,6 +83,13 @@ const AdminDashboard = () => {
                             <div className="sidebar-icon"><CalendarDays size={18} /></div>
                             Calendario
                         </button>
+                        <button
+                            onClick={() => { setActiveTab('instructors'); setIsSidebarOpen(false); }}
+                            className={`dash-sidebar-item ${activeTab === 'instructors' ? 'active' : ''}`}
+                        >
+                            <div className="sidebar-icon"><Users size={18} /></div>
+                            Instructores
+                        </button>
                     </nav>
 
                     <footer className="dash-sidebar-footer">
@@ -102,24 +111,30 @@ const AdminDashboard = () => {
                 {/* Content Area */}
                 <div className="dash-content">
                     <main className="dash-content-inner">
-                        <div className="dash-header">
-                            <h1 className="dash-title">
-                                {activeTab === 'overview' ? 'Panel de Control' :
-                                    activeTab === 'classes' ? 'Gestión de Clases' :
-                                        activeTab === 'members' ? 'Gestión de Miembros' :
-                                            activeTab === 'calendar' ? 'Calendario' : 'Reservaciones'}
-                            </h1>
-                            <p className="dash-subtitle">
-                                {activeTab === 'overview'
-                                    ? 'Resumen general de la actividad de tu estudio.'
-                                    : activeTab === 'classes'
-                                        ? 'Creá, editá y controlá las reservas de tus clases.'
-                                        : activeTab === 'calendar'
-                                            ? 'Visualizá las clases del mes en el calendario.'
-                                            : activeTab === 'members'
-                                                ? 'Administrá los miembros registrados en el estudio.'
-                                                : 'Gestioná las reservaciones de tus clases.'}
-                            </p>
+                        <div className="dash-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                            <div>
+                                <h1 className="dash-title">
+                                    {activeTab === 'overview' ? 'Panel de Control' :
+                                        activeTab === 'classes' ? 'Gestión de Clases' :
+                                            activeTab === 'members' ? 'Gestión de Miembros' :
+                                                activeTab === 'calendar' ? 'Calendario' :
+                                                    activeTab === 'instructors' ? 'Gestión de Instructores' : 'Reservaciones'}
+                                </h1>
+                                <p className="dash-subtitle">
+                                    {activeTab === 'overview'
+                                        ? 'Resumen general de la actividad de tu estudio.'
+                                        : activeTab === 'classes'
+                                            ? 'Creá, editá y controlá las reservas de tus clases.'
+                                            : activeTab === 'calendar'
+                                                ? 'Visualizá las clases del mes en el calendario.'
+                                                : activeTab === 'members'
+                                                    ? 'Administrá los miembros registrados en el estudio.'
+                                                    : activeTab === 'instructors'
+                                                        ? 'Administrá los instructores del estudio.'
+                                                        : 'Gestioná las reservaciones de tus clases.'}
+                                </p>
+                            </div>
+                            <NotificationBell />
                         </div>
 
                         {/* Overview Section */}
@@ -162,6 +177,11 @@ const AdminDashboard = () => {
                         {/* Calendar Section */}
                         {activeTab === 'calendar' && (
                             <AdminCalendar key={refreshKey} />
+                        )}
+
+                        {/* Instructors Section */}
+                        {activeTab === 'instructors' && (
+                            <AdminInstructors />
                         )}
                     </main>
                 </div>

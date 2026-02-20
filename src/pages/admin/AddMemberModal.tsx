@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { X, User, Mail, Lock } from 'lucide-react';
+import { getCurrentTenantId } from '../../lib/tenant';
 
 interface AddMemberModalProps {
     isOpen: boolean;
@@ -48,6 +49,7 @@ const AddMemberModal = ({ isOpen, onClose, onSuccess }: AddMemberModalProps) => 
                 data: {
                     full_name: formData.full_name,
                     start_date: formData.start_date,
+                    tenant_id: getCurrentTenantId(),
                 },
             },
         });

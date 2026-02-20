@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
+import { getCurrentTenantId } from '../../lib/tenant';
 import { User, Plus } from 'lucide-react';
 import AddMemberModal from './AddMemberModal';
 import { useToast } from '../../components/ui/Toast';
@@ -39,6 +40,7 @@ const AdminMembers = ({ forceOpenAddModal, onModalClose }: AdminMembersProps) =>
         const { data, error } = await supabase
             .from('profiles')
             .select('*')
+            .eq('tenant_id', getCurrentTenantId())
             .order('created_at', { ascending: false });
 
         if (error) {
@@ -57,7 +59,8 @@ const AdminMembers = ({ forceOpenAddModal, onModalClose }: AdminMembersProps) =>
         const { error } = await supabase
             .from('profiles')
             .update({ active: !currentStatus })
-            .eq('id', id);
+            .eq('id', id)
+            .eq('tenant_id', getCurrentTenantId());
 
         if (error) {
             toast.error(error.message);

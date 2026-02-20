@@ -4,6 +4,7 @@ import { format, startOfWeek, addDays, isSameDay, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Calendar, ChevronDown, Trash2 } from 'lucide-react';
 import { useToast } from '../../components/ui/Toast';
+import { getCurrentTenantId } from '../../lib/tenant';
 
 interface Class {
     id: string;
@@ -12,6 +13,9 @@ interface Class {
     start_time: string;
     end_time: string;
     max_capacity: number;
+    reservation_count?: number;
+    instructor?: { name: string } | null;
+    instructor_name?: string;
 }
 
 interface Reservation {
@@ -43,18 +47,35 @@ const AdminReservations = () => {
     const quickDates = getWeekDays(selectedDate);
 
     const fetchClasses = async (date: string) => {
-        const { data, error } = await supabase
+        const { data: classesData, error } = await supabase
             .from('classes')
-            .select('*')
+            .select('*, instructor:instructors(name)')
             .eq('class_date', date)
+            .eq('tenant_id', getCurrentTenantId())
             .order('start_time', { ascending: true });
 
-        if (!error && data) {
-            setClasses(data);
-            if (data.length > 0) {
-                // Keep current selection if it's in the new list, otherwise pick the first one
-                if (!data.find(c => c.id === selectedClassId)) {
-                    setSelectedClassId(data[0].id);
+        if (!error && classesData) {
+            // Fetch active counts
+            const { data: resData } = await supabase
+                .from('reservations')
+                .select('class_id')
+                .eq('status', 'active')
+                .eq('tenant_id', getCurrentTenantId());
+
+            const countMap = new Map<string, number>();
+            resData?.forEach(r => {
+                countMap.set(r.class_id, (countMap.get(r.class_id) || 0) + 1);
+            });
+
+            const merged = classesData.map(c => ({
+                ...c,
+                reservation_count: countMap.get(c.id) || 0
+            }));
+
+            setClasses(merged);
+            if (merged.length > 0) {
+                if (!merged.find(c => c.id === selectedClassId)) {
+                    setSelectedClassId(merged[0].id);
                 }
             } else {
                 setSelectedClassId('');
@@ -68,8 +89,10 @@ const AdminReservations = () => {
         setLoadingRes(true);
         const { data, error } = await supabase
             .from('reservations')
-            .select('*, profiles(full_name, email)') // Note: email column added by user recommendation
-            .eq('class_id', classId);
+            .select('*, profiles(full_name, email)')
+            .eq('class_id', classId)
+            .eq('status', 'active')
+            .eq('tenant_id', getCurrentTenantId());
 
         if (!error && data) {
             setReservations(data as any);
@@ -89,8 +112,9 @@ const AdminReservations = () => {
 
         const { error } = await supabase
             .from('reservations')
-            .delete()
-            .eq('id', reservationId);
+            .update({ status: 'cancelled' })
+            .eq('id', reservationId)
+            .eq('tenant_id', getCurrentTenantId());
 
         if (error) {
             toast.error('Error al cancelar la reservación: ' + error.message);
@@ -140,7 +164,7 @@ const AdminReservations = () => {
                                 ) : (
                                     classes.map(c => (
                                         <option key={c.id} value={c.id}>
-                                            {c.title} ({c.start_time.slice(0, 5)} - {c.end_time.slice(0, 5)})
+                                            {c.title} ({c.instructor?.name || c.instructor_name || 'Sin instructor'}) - {c.start_time.slice(0, 5)} [{c.reservation_count}/{c.max_capacity}]
                                         </option>
                                     ))
                                 )}
@@ -191,7 +215,7 @@ const AdminReservations = () => {
                 {selectedClassObj && (
                     <div className="res-results-header">
                         <h3 className="res-class-title">{selectedClassObj.title}</h3>
-                        <p className="res-class-info">{formattedDate}</p>
+                        <p className="res-class-info">{formattedDate} — Prof: {selectedClassObj.instructor?.name || selectedClassObj.instructor_name || 'Sin especificar'}</p>
                     </div>
                 )}
 

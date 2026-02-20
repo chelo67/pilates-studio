@@ -16,6 +16,7 @@ import { es } from 'date-fns/locale';
 import { Clock, Users, ChevronLeft, ChevronRight, CalendarDays, Trash2 } from 'lucide-react';
 import ClassReservationsModal from './ClassReservationsModal';
 import { useToast } from '../../components/ui/Toast';
+import { getCurrentTenantId } from '../../lib/tenant';
 
 interface ClassItem {
     id: string;
@@ -26,6 +27,9 @@ interface ClassItem {
     end_time: string;
     max_capacity: number;
     reservation_count: number;
+    instructor?: { name: string } | null;
+    instructor_name?: string;
+    status: 'active' | 'closed' | 'cancelled';
 }
 
 const AdminCalendar = () => {
@@ -47,6 +51,7 @@ const AdminCalendar = () => {
         const { data } = await supabase
             .from('classes')
             .select('class_date')
+            .eq('tenant_id', getCurrentTenantId())
             .gte('class_date', start)
             .lte('class_date', end);
 
@@ -63,21 +68,35 @@ const AdminCalendar = () => {
     const fetchClassesForDay = async (dateStr: string) => {
         setLoading(true);
 
-        const { data, error } = await supabase
+        const { data: classesData, error: classesError } = await supabase
             .from('classes')
-            .select('*, reservations(count)')
+            .select('*, instructor:instructors(name)')
             .eq('class_date', dateStr)
+            .eq('tenant_id', getCurrentTenantId())
             .order('start_time', { ascending: true });
 
-        if (error) {
-            console.error('Error fetching classes:', error);
+        if (classesError) {
+            console.error('Error fetching classes:', classesError);
             setLoading(false);
             return;
         }
 
-        const mergedData = data?.map(cls => ({
+        // Fetch active counts for these classes
+        const { data: resData } = await supabase
+            .from('reservations')
+            .select('class_id')
+            .in('class_id', classesData?.map(c => c.id) || [])
+            .eq('status', 'active')
+            .eq('tenant_id', getCurrentTenantId());
+
+        const countMap = new Map<string, number>();
+        resData?.forEach(r => {
+            countMap.set(r.class_id, (countMap.get(r.class_id) || 0) + 1);
+        });
+
+        const mergedData = classesData?.map(cls => ({
             ...cls,
-            reservation_count: cls.reservations?.[0]?.count || 0,
+            reservation_count: countMap.get(cls.id) || 0,
         })) || [];
 
         setClasses(mergedData);
@@ -95,7 +114,11 @@ const AdminCalendar = () => {
         });
         if (!confirmed) return;
 
-        const { error } = await supabase.from('classes').delete().eq('id', id);
+        const { error } = await supabase
+            .from('classes')
+            .delete()
+            .eq('id', id)
+            .eq('tenant_id', getCurrentTenantId());
         if (error) {
             toast.error(error.message);
         } else {
@@ -217,13 +240,24 @@ const AdminCalendar = () => {
                                         <div className="admin-cal-class-top">
                                             <div className="admin-cal-class-info">
                                                 <h3 className="admin-cal-class-title">{cls.title}</h3>
+                                                <p className="admin-cal-class-desc" style={{ color: 'rgba(255,255,255,0.7)', fontWeight: 500 }}>
+                                                    Prof: {cls.instructor?.name || cls.instructor_name || 'Sin especificar'}
+                                                </p>
                                                 {cls.description && (
                                                     <p className="admin-cal-class-desc">{cls.description}</p>
                                                 )}
                                             </div>
-                                            <span className={`dash-badge ${isFull ? 'dash-badge-red' : 'dash-badge-green'}`}>
-                                                {isFull ? 'Completa' : 'Disponible'}
-                                            </span>
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', alignItems: 'flex-end' }}>
+                                                {cls.status === 'active' ? (
+                                                    <span className={`dash-badge ${isFull ? 'dash-badge-red' : 'dash-badge-green'}`}>
+                                                        {isFull ? 'Completa' : 'Disponible'}
+                                                    </span>
+                                                ) : cls.status === 'closed' ? (
+                                                    <span className="dash-badge dash-badge-blue">Cerrada</span>
+                                                ) : (
+                                                    <span className="dash-badge dash-badge-red">Cancelada</span>
+                                                )}
+                                            </div>
                                         </div>
 
                                         <div className="admin-cal-class-meta">
