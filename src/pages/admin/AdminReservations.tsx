@@ -222,8 +222,8 @@ const AdminReservations = () => {
                             ) : (
                                 reservations.map((res, index) => (
                                     <tr key={res.id}>
-                                        <td>{index + 1}</td>
-                                        <td>
+                                        <td data-label="#">{index + 1}</td>
+                                        <td data-label="Miembro">
                                             <div className="res-member-cell">
                                                 <div className="res-avatar">
                                                     {res.profiles?.full_name?.charAt(0)}
@@ -231,12 +231,12 @@ const AdminReservations = () => {
                                                 <span>{res.profiles?.full_name}</span>
                                             </div>
                                         </td>
-                                        <td>
+                                        <td data-label="Email">
                                             <span className="res-email-text">
                                                 {res.profiles?.email || '—'}
                                             </span>
                                         </td>
-                                        <td>
+                                        <td data-label="Acciones">
                                             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                                                 <button
                                                     className="dash-btn-icon dash-btn-danger"

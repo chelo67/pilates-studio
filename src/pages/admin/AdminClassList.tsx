@@ -84,7 +84,7 @@ const AdminClassList = () => {
                     <tbody>
                         {classes.map((cls) => (
                             <tr key={cls.id}>
-                                <td>
+                                <td data-label="Fecha y Hora">
                                     <div style={{ fontWeight: 500 }}>
                                         {(() => {
                                             const [y, m, d] = cls.class_date.split('-').map(Number);
@@ -95,10 +95,10 @@ const AdminClassList = () => {
                                         {cls.start_time.slice(0, 5)} - {cls.end_time.slice(0, 5)}
                                     </div>
                                 </td>
-                                <td style={{ fontWeight: 500, color: 'rgba(255,255,255,0.95)' }}>
+                                <td data-label="Título" style={{ fontWeight: 500, color: 'rgba(255,255,255,0.95)' }}>
                                     {cls.title}
                                 </td>
-                                <td>
+                                <td data-label="Capacidad">
                                     <button
                                         onClick={() => setSelectedClassId(cls.id)}
                                         className="dash-badge dash-badge-purple"
@@ -109,7 +109,7 @@ const AdminClassList = () => {
                                         {cls.reservations?.[0]?.count || 0} / {cls.max_capacity}
                                     </button>
                                 </td>
-                                <td>
+                                <td data-label="Acciones">
                                     <div style={{ display: 'flex', gap: '0.25rem', justifyContent: 'flex-end' }}>
                                         <button
                                             onClick={() => setSelectedClassId(cls.id)}

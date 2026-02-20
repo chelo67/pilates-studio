@@ -108,7 +108,7 @@ const AdminMembers = ({ forceOpenAddModal, onModalClose }: AdminMembersProps) =>
                     <tbody>
                         {members.map((member) => (
                             <tr key={member.id}>
-                                <td>
+                                <td data-label="Nombre">
                                     <div className="dash-member-row">
                                         <div className="dash-avatar">
                                             <User size={14} />
@@ -123,22 +123,22 @@ const AdminMembers = ({ forceOpenAddModal, onModalClose }: AdminMembersProps) =>
                                         </div>
                                     </div>
                                 </td>
-                                <td>
+                                <td data-label="Rol">
                                     <span className={`dash-badge ${member.role === 'admin' ? 'dash-badge-purple' : 'dash-badge-gray'}`}>
                                         {member.role}
                                     </span>
                                 </td>
-                                <td>
+                                <td data-label="Fecha Inicio">
                                     <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
                                         {member.start_date ? new Date(member.start_date).toLocaleDateString() : '—'}
                                     </span>
                                 </td>
-                                <td>
+                                <td data-label="Estado">
                                     <span className={`dash-badge ${member.active ? 'dash-badge-green' : 'dash-badge-red'}`}>
                                         {member.active ? 'Activo' : 'Inactivo'}
                                     </span>
                                 </td>
-                                <td>
+                                <td data-label="Acciones">
                                     <button
                                         onClick={() => toggleStatus(member.id, member.active)}
                                         className={member.active ? 'dash-btn-danger' : 'dash-btn-primary'}

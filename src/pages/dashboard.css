@@ -337,6 +337,8 @@
     font-size: 0.875rem;
     color: rgba(255, 255, 255, 0.8);
     border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    white-space: normal;
+    word-break: break-word;
 }
 
 .dash-table td:last-child {
@@ -1643,6 +1645,80 @@
 
     .dash-tab {
         white-space: nowrap;
+    }
+
+    /* Table adjustments for very small screens */
+    .dash-table th,
+    .dash-table td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    .dash-table-sub {
+        font-size: 0.7rem;
+    }
+
+    .dash-icon-btn {
+        width: 1.75rem;
+        height: 1.75rem;
+    }
+
+    /* Transform table into cards on mobile */
+    @media (max-width: 650px) {
+
+        .dash-table,
+        .dash-table thead,
+        .dash-table tbody,
+        .dash-table th,
+        .dash-table td,
+        .dash-table tr {
+            display: block;
+        }
+
+        .dash-table thead tr {
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+        }
+
+        .dash-table tr {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 1.25rem 0.5rem;
+            position: relative;
+        }
+
+        .dash-table tr:last-child {
+            border-bottom: none;
+        }
+
+        .dash-table td {
+            border: none;
+            padding: 0.5rem 0.75rem !important;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-align: left !important;
+            font-size: 0.9rem !important;
+        }
+
+        .dash-table td::before {
+            content: attr(data-label);
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.35);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-right: 1rem;
+        }
+
+        .dash-table td>div {
+            text-align: right;
+        }
+
+        .dash-table-wrap {
+            overflow: visible;
+            background: rgba(255, 255, 255, 0.03);
+        }
     }
 }
 
