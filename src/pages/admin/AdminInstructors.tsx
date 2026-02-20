@@ -261,7 +261,7 @@ const AdminInstructors = () => {
                                         id="instructor-active"
                                         checked={formData.active}
                                         onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
-                                        style={{ width: '1.2rem', height: '1.2rem', accentColor: '#a855f7' }}
+                                        style={{ width: '1.2rem', height: '1.2rem', accentColor: 'var(--brand-secondary)' }}
                                     />
                                     <label htmlFor="instructor-active" className="dash-form-label" style={{ margin: 0 }}>Instructor activo</label>
                                 </div>

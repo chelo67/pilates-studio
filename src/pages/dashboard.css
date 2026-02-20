@@ -3,6 +3,12 @@
    Matches auth page aesthetic
    ============================== */
 
+:root {
+    --brand-primary: #7c3aed;
+    --brand-secondary: #a855f7;
+    --brand-primary-rgb: 124, 58, 237;
+}
+
 /* ---------- Animated background (shared with auth) ---------- */
 .dash-page {
     position: relative;
@@ -61,7 +67,7 @@
 .dash-navbar-brand .brand-icon {
     width: 2.25rem;
     height: 2.25rem;
-    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
     border-radius: 0.5rem;
     display: flex;
     align-items: center;
@@ -104,8 +110,8 @@
 
 .dash-nav-link.active {
     color: #fff;
-    background: rgba(124, 58, 237, 0.3);
-    border: 1px solid rgba(124, 58, 237, 0.3);
+    background: rgba(var(--brand-primary-rgb), 0.3);
+    border: 1px solid rgba(var(--brand-primary-rgb), 0.3);
 }
 
 .dash-nav-right {
@@ -191,9 +197,9 @@
 
 .dash-tab.active {
     color: #fff;
-    background: linear-gradient(135deg, rgba(124, 58, 237, 0.5), rgba(168, 85, 247, 0.4));
-    border-color: rgba(124, 58, 237, 0.4);
-    box-shadow: 0 0 20px rgba(124, 58, 237, 0.15);
+    background: linear-gradient(135deg, rgba(var(--brand-primary-rgb), 0.5), rgba(var(--brand-secondary-rgb), 0.4));
+    border-color: rgba(var(--brand-primary-rgb), 0.4);
+    box-shadow: 0 0 20px rgba(var(--brand-primary-rgb), 0.15);
 }
 
 /* ---------- Section header row ---------- */
@@ -220,17 +226,17 @@
     font-size: 0.875rem;
     font-weight: 600;
     color: #fff;
-    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
     border: none;
     border-radius: 0.6rem;
     cursor: pointer;
     transition: all 0.25s ease;
-    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+    box-shadow: 0 4px 15px rgba(var(--brand-primary-rgb), 0.3);
 }
 
 .dash-btn-primary:hover {
     transform: translateY(-1px);
-    box-shadow: 0 6px 25px rgba(124, 58, 237, 0.45);
+    box-shadow: 0 6px 25px rgba(var(--brand-primary-rgb), 0.45);
 }
 
 .dash-btn-primary:disabled {
@@ -293,7 +299,7 @@
 }
 
 .dash-card:hover {
-    border-color: rgba(124, 58, 237, 0.25);
+    border-color: rgba(var(--brand-primary-rgb), 0.25);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
 }
 
@@ -380,9 +386,9 @@
 }
 
 .dash-badge-purple {
-    background: rgba(124, 58, 237, 0.2);
+    background: rgba(var(--brand-primary-rgb), 0.2);
     color: #c4b5fd;
-    border: 1px solid rgba(124, 58, 237, 0.25);
+    border: 1px solid rgba(var(--brand-primary-rgb), 0.25);
 }
 
 .dash-badge-green {
@@ -446,8 +452,8 @@
     width: 2.25rem;
     height: 2.25rem;
     border-radius: 50%;
-    background: linear-gradient(135deg, rgba(124, 58, 237, 0.3), rgba(168, 85, 247, 0.2));
-    border: 1px solid rgba(124, 58, 237, 0.2);
+    background: linear-gradient(135deg, rgba(var(--brand-primary-rgb), 0.3), rgba(var(--brand-secondary-rgb), 0.2));
+    border: 1px solid rgba(var(--brand-primary-rgb), 0.2);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -598,8 +604,8 @@
 
 .dash-form-input:focus,
 .dash-form-textarea:focus {
-    border-color: rgba(124, 58, 237, 0.5);
-    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
+    border-color: rgba(var(--brand-primary-rgb), 0.5);
+    box-shadow: 0 0 0 3px rgba(var(--brand-primary-rgb), 0.12);
     background: rgba(255, 255, 255, 0.08);
 }
 
@@ -640,7 +646,7 @@ select.dash-form-input {
 }
 
 .dash-class-card:hover {
-    border-color: rgba(124, 58, 237, 0.3);
+    border-color: rgba(var(--brand-primary-rgb), 0.3);
     transform: translateY(-2px);
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
 }
@@ -716,12 +722,12 @@ select.dash-form-input {
 
 .dash-book-btn-primary {
     color: #fff;
-    background: linear-gradient(135deg, #7c3aed, #a855f7);
-    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.25);
+    background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+    box-shadow: 0 4px 15px rgba(var(--brand-primary-rgb), 0.25);
 }
 
 .dash-book-btn-primary:hover:not(:disabled) {
-    box-shadow: 0 6px 25px rgba(124, 58, 237, 0.4);
+    box-shadow: 0 6px 25px rgba(var(--brand-primary-rgb), 0.4);
     transform: translateY(-1px);
 }
 
@@ -822,8 +828,8 @@ select.dash-form-input {
 .dash-spinner {
     width: 2rem;
     height: 2rem;
-    border: 2.5px solid rgba(124, 58, 237, 0.15);
-    border-top-color: #a855f7;
+    border: 2.5px solid rgba(var(--brand-primary-rgb), 0.15);
+    border-top-color: var(--brand-secondary);
     border-radius: 50%;
     animation: dash-spin 0.75s linear infinite;
 }
@@ -964,13 +970,13 @@ select.dash-form-input {
 .dash-sidebar-brand .brand-icon {
     width: 2.5rem;
     height: 2.5rem;
-    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
     border-radius: 0.65rem;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+    box-shadow: 0 4px 15px rgba(var(--brand-primary-rgb), 0.3);
 }
 
 .dash-sidebar-brand-text {
@@ -991,7 +997,7 @@ select.dash-form-input {
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    color: rgba(168, 85, 247, 0.7);
+    color: rgba(var(--brand-secondary-rgb), 0.7);
     margin-top: 0.1rem;
 }
 
@@ -1043,9 +1049,9 @@ select.dash-form-input {
 
 .dash-sidebar-item.active {
     color: #fff;
-    background: linear-gradient(135deg, rgba(124, 58, 237, 0.35), rgba(168, 85, 247, 0.2));
-    border-color: rgba(124, 58, 237, 0.25);
-    box-shadow: 0 0 20px rgba(124, 58, 237, 0.1);
+    background: linear-gradient(135deg, rgba(var(--brand-primary-rgb), 0.35), rgba(var(--brand-secondary-rgb), 0.2));
+    border-color: rgba(var(--brand-primary-rgb), 0.25);
+    box-shadow: 0 0 20px rgba(var(--brand-primary-rgb), 0.1);
 }
 
 .dash-sidebar-item .sidebar-icon {
@@ -1061,7 +1067,7 @@ select.dash-form-input {
 }
 
 .dash-sidebar-item.active .sidebar-icon {
-    background: rgba(124, 58, 237, 0.3);
+    background: rgba(var(--brand-primary-rgb), 0.3);
 }
 
 /* Sidebar footer / user section */
@@ -1082,7 +1088,7 @@ select.dash-form-input {
     width: 2rem;
     height: 2rem;
     border-radius: 50%;
-    background: linear-gradient(135deg, rgba(124, 58, 237, 0.4), rgba(168, 85, 247, 0.3));
+    background: linear-gradient(135deg, rgba(var(--brand-primary-rgb), 0.4), rgba(var(--brand-secondary-rgb), 0.3));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1349,7 +1355,7 @@ select.dash-form-input {
     width: 2.5rem;
     height: 2.5rem;
     border-radius: 50%;
-    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1516,10 +1522,10 @@ select.dash-form-input {
 }
 
 .res-day-btn.active {
-    background: #7c3aed;
-    border-color: #8b5cf6;
+    background: var(--brand-primary);
+    border-color: var(--brand-secondary);
     color: #fff;
-    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+    box-shadow: 0 4px 12px rgba(var(--brand-primary-rgb), 0.3);
 }
 
 .res-day-name {
@@ -1564,7 +1570,7 @@ select.dash-form-input {
     width: 2rem;
     height: 2rem;
     border-radius: 50%;
-    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1796,8 +1802,8 @@ select.dash-form-input {
 }
 
 .calendar-nav-btn:hover {
-    background: rgba(124, 58, 237, 0.25);
-    border-color: rgba(124, 58, 237, 0.35);
+    background: rgba(var(--brand-primary-rgb), 0.25);
+    border-color: rgba(var(--brand-primary-rgb), 0.35);
     color: #fff;
 }
 
@@ -1807,8 +1813,8 @@ select.dash-form-input {
     justify-content: center;
     padding: 0.3rem 0.75rem;
     border-radius: 0.5rem;
-    border: 1px solid rgba(124, 58, 237, 0.3);
-    background: rgba(124, 58, 237, 0.15);
+    border: 1px solid rgba(var(--brand-primary-rgb), 0.3);
+    background: rgba(var(--brand-primary-rgb), 0.15);
     color: #c4b5fd;
     font-size: 0.75rem;
     font-weight: 600;
@@ -1819,9 +1825,9 @@ select.dash-form-input {
 }
 
 .calendar-today-btn:hover {
-    background: rgba(124, 58, 237, 0.3);
+    background: rgba(var(--brand-primary-rgb), 0.3);
     color: #fff;
-    border-color: rgba(124, 58, 237, 0.5);
+    border-color: rgba(var(--brand-primary-rgb), 0.5);
 }
 
 /* ---------- Calendar Grid ---------- */
@@ -1870,23 +1876,23 @@ select.dash-form-input {
 
 /* Today marker */
 .calendar-day-cell.today {
-    background: rgba(124, 58, 237, 0.15);
+    background: rgba(var(--brand-primary-rgb), 0.15);
     color: #c4b5fd;
     font-weight: 700;
-    border: 1px solid rgba(124, 58, 237, 0.3);
+    border: 1px solid rgba(var(--brand-primary-rgb), 0.3);
 }
 
 /* Selected day */
 .calendar-day-cell.selected {
-    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
     color: #fff;
     font-weight: 700;
-    box-shadow: 0 4px 16px rgba(124, 58, 237, 0.45);
+    box-shadow: 0 4px 16px rgba(var(--brand-primary-rgb), 0.45);
     border: none;
 }
 
 .calendar-day-cell.selected:hover {
-    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
 }
 
 /* Day has classes indicator (small dot) */
@@ -2029,7 +2035,7 @@ select.dash-form-input {
 
 .admin-cal-class-card:hover {
     background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(124, 58, 237, 0.2);
+    border-color: rgba(var(--brand-primary-rgb), 0.2);
 }
 
 .admin-cal-class-top {
@@ -2121,7 +2127,7 @@ select.dash-form-input {
     font-size: 0.55rem;
     font-weight: 700;
     color: #c4b5fd;
-    background: rgba(124, 58, 237, 0.25);
+    background: rgba(var(--brand-primary-rgb), 0.25);
     width: 14px;
     height: 14px;
     border-radius: 50%;
@@ -2323,9 +2329,9 @@ select.dash-form-input {
 }
 
 .toast-confirm-icon-info {
-    background: rgba(124, 58, 237, 0.15);
+    background: rgba(var(--brand-primary-rgb), 0.15);
     color: #a78bfa;
-    border: 1px solid rgba(124, 58, 237, 0.2);
+    border: 1px solid rgba(var(--brand-primary-rgb), 0.2);
 }
 
 .toast-confirm-title {
@@ -2381,12 +2387,12 @@ select.dash-form-input {
 }
 
 .toast-confirm-btn-primary {
-    background: linear-gradient(135deg, #7c3aed, #a855f7);
-    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+    background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+    box-shadow: 0 4px 15px rgba(var(--brand-primary-rgb), 0.3);
 }
 
 .toast-confirm-btn-primary:hover {
-    box-shadow: 0 6px 25px rgba(124, 58, 237, 0.45);
+    box-shadow: 0 6px 25px rgba(var(--brand-primary-rgb), 0.45);
     transform: translateY(-1px);
 }
 

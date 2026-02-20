@@ -7,25 +7,28 @@ import MemberReservations from './pages/member/MyReservations';
 import ProtectedRoute from './components/layout/ProtectedRoute';
 import { AuthProvider } from './hooks/useAuth';
 import { ToastProvider } from './components/ui/Toast';
+import { BrandingProvider } from './contexts/BrandingContext';
 
 function App() {
   return (
     <AuthProvider>
-      <ToastProvider>
-        <Router>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+      <BrandingProvider>
+        <ToastProvider>
+          <Router>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
 
-            {/* Admin Routes */}
-            <Route path="/admin" element={<ProtectedRoute role="admin"><AdminDashboard /></ProtectedRoute>} />
+              {/* Admin Routes */}
+              <Route path="/admin" element={<ProtectedRoute role="admin"><AdminDashboard /></ProtectedRoute>} />
 
-            {/* Member Routes */}
-            <Route path="/" element={<ProtectedRoute role="member"><MemberSchedule /></ProtectedRoute>} />
-            <Route path="/my-reservations" element={<ProtectedRoute role="member"><MemberReservations /></ProtectedRoute>} />
-          </Routes>
-        </Router>
-      </ToastProvider>
+              {/* Member Routes */}
+              <Route path="/" element={<ProtectedRoute role="member"><MemberSchedule /></ProtectedRoute>} />
+              <Route path="/my-reservations" element={<ProtectedRoute role="member"><MemberReservations /></ProtectedRoute>} />
+            </Routes>
+          </Router>
+        </ToastProvider>
+      </BrandingProvider>
     </AuthProvider>
   );
 }

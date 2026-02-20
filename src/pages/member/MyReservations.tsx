@@ -7,11 +7,13 @@ import { Link, useLocation } from 'react-router-dom';
 import { useToast } from '../../components/ui/Toast';
 import { getCurrentTenantId } from '../../lib/tenant';
 import NotificationBell from '../../components/NotificationBell';
+import { useBranding } from '../../contexts/BrandingContext';
 
 const MemberReservations = () => {
     const { user, signOut } = useAuth();
     const location = useLocation();
     const { toast, confirm } = useToast();
+    const { settings } = useBranding();
     const [reservations, setReservations] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -73,14 +75,18 @@ const MemberReservations = () => {
                 <aside className={`dash-sidebar ${isSidebarOpen ? 'open' : ''}`}>
                     <div className="dash-sidebar-brand">
                         <div className="brand-icon">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <circle cx="12" cy="12" r="10" />
-                                <path d="M12 8a4 4 0 0 0-4 4" />
-                                <circle cx="12" cy="12" r="2" />
-                            </svg>
+                            {settings.logo_url ? (
+                                <img src={settings.logo_url} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                            ) : (
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <path d="M12 8a4 4 0 0 0-4 4" />
+                                    <circle cx="12" cy="12" r="2" />
+                                </svg>
+                            )}
                         </div>
                         <div className="dash-sidebar-brand-text">
-                            <span className="brand-name">Pilates Studio</span>
+                            <span className="brand-name">{settings.business_name}</span>
                             <span className="brand-role">Miembro</span>
                         </div>
                     </div>
@@ -140,7 +146,7 @@ const MemberReservations = () => {
                         ) : reservations.length === 0 ? (
                             <div className="dash-card" style={{ padding: '3rem 2rem' }}>
                                 <div className="dash-empty">
-                                    No tenés reservas todavía. <Link to="/" style={{ color: '#a855f7' }}>Reservá una clase</Link>
+                                    No tenés reservas todavía. <Link to="/" style={{ color: 'var(--brand-secondary)' }}>Reservá una clase</Link>
                                 </div>
                             </div>
                         ) : (

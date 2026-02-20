@@ -7,13 +7,16 @@ import AdminOverview from './AdminOverview';
 import AdminReservations from './AdminReservations';
 import AdminInstructors from './AdminInstructors';
 import AdminCalendar from './AdminCalendar';
-import { Plus, Users, Calendar, LogOut, Menu, X, Activity, CalendarDays } from 'lucide-react';
+import AdminBranding from './AdminBranding';
+import { Plus, Users, Calendar, LogOut, Menu, X, Activity, CalendarDays, Palette } from 'lucide-react';
 import NotificationBell from '../../components/NotificationBell';
+import { useBranding } from '../../contexts/BrandingContext';
 
 const AdminDashboard = () => {
     const { user, signOut } = useAuth();
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [activeTab, setActiveTab] = useState<'overview' | 'classes' | 'members' | 'reservations' | 'calendar' | 'instructors'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'classes' | 'members' | 'reservations' | 'calendar' | 'instructors' | 'branding'>('overview');
+    const { settings } = useBranding();
     const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
     const [refreshKey, setRefreshKey] = useState(0);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -32,14 +35,18 @@ const AdminDashboard = () => {
                 <aside className={`dash-sidebar ${isSidebarOpen ? 'open' : ''}`}>
                     <div className="dash-sidebar-brand">
                         <div className="brand-icon">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <circle cx="12" cy="12" r="10" />
-                                <path d="M12 8a4 4 0 0 0-4 4" />
-                                <circle cx="12" cy="12" r="2" />
-                            </svg>
+                            {settings.logo_url ? (
+                                <img src={settings.logo_url} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                            ) : (
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <path d="M12 8a4 4 0 0 0-4 4" />
+                                    <circle cx="12" cy="12" r="2" />
+                                </svg>
+                            )}
                         </div>
                         <div className="dash-sidebar-brand-text">
-                            <span className="brand-name">Pilates Studio</span>
+                            <span className="brand-name">{settings.business_name}</span>
                             <span className="brand-role">Administración</span>
                         </div>
                     </div>
@@ -90,6 +97,14 @@ const AdminDashboard = () => {
                             <div className="sidebar-icon"><Users size={18} /></div>
                             Instructores
                         </button>
+                        <div style={{ margin: '1rem 0 0.5rem 0', height: '1px', background: 'rgba(255,255,255,0.05)' }}></div>
+                        <button
+                            onClick={() => { setActiveTab('branding'); setIsSidebarOpen(false); }}
+                            className={`dash-sidebar-item ${activeTab === 'branding' ? 'active' : ''}`}
+                        >
+                            <div className="sidebar-icon"><Palette size={18} /></div>
+                            Branding
+                        </button>
                     </nav>
 
                     <footer className="dash-sidebar-footer">
@@ -118,7 +133,8 @@ const AdminDashboard = () => {
                                         activeTab === 'classes' ? 'Gestión de Clases' :
                                             activeTab === 'members' ? 'Gestión de Miembros' :
                                                 activeTab === 'calendar' ? 'Calendario' :
-                                                    activeTab === 'instructors' ? 'Gestión de Instructores' : 'Reservaciones'}
+                                                    activeTab === 'branding' ? 'Marca e Identidad' :
+                                                        activeTab === 'instructors' ? 'Gestión de Instructores' : 'Reservaciones'}
                                 </h1>
                                 <p className="dash-subtitle">
                                     {activeTab === 'overview'
@@ -182,6 +198,11 @@ const AdminDashboard = () => {
                         {/* Instructors Section */}
                         {activeTab === 'instructors' && (
                             <AdminInstructors />
+                        )}
+
+                        {/* Branding Section */}
+                        {activeTab === 'branding' && (
+                            <AdminBranding />
                         )}
                     </main>
                 </div>

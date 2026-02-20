@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useNavigate, Link } from 'react-router-dom';
 import { useToast } from '../../components/ui/Toast';
+import { useBranding } from '../../contexts/BrandingContext';
 
 const Register = () => {
     const [email, setEmail] = useState('');
@@ -12,6 +13,7 @@ const Register = () => {
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
     const { toast } = useToast();
+    const { settings } = useBranding();
 
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -59,7 +61,7 @@ const Register = () => {
                                 <line x1="16" y1="30" x2="32" y2="30" stroke="white" strokeWidth="1.5" opacity="0.4" />
                             </svg>
                         </div>
-                        <h1 className="auth-brand-title">Pilates Studio</h1>
+                        <h1 className="auth-brand-title">{settings.business_name}</h1>
                         <p className="auth-brand-subtitle">Comenzá tu camino hacia el bienestar</p>
                         <div className="auth-brand-features">
                             <div className="auth-feature">

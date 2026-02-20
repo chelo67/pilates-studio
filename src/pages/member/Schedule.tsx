@@ -20,6 +20,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useToast } from '../../components/ui/Toast';
 import { getCurrentTenantId } from '../../lib/tenant';
 import NotificationBell from '../../components/NotificationBell';
+import { useBranding } from '../../contexts/BrandingContext';
 
 interface ClassItem {
     id: string;
@@ -41,6 +42,7 @@ const MemberSchedule = () => {
     const { user, signOut } = useAuth();
     const location = useLocation();
     const { toast, confirm } = useToast();
+    const { settings } = useBranding();
 
     // State
     const [viewDate, setViewDate] = useState(new Date());
@@ -256,14 +258,18 @@ const MemberSchedule = () => {
                 <aside className={`dash-sidebar ${isSidebarOpen ? 'open' : ''}`}>
                     <div className="dash-sidebar-brand">
                         <div className="brand-icon">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <circle cx="12" cy="12" r="10" />
-                                <path d="M12 8a4 4 0 0 0-4 4" />
-                                <circle cx="12" cy="12" r="2" />
-                            </svg>
+                            {settings.logo_url ? (
+                                <img src={settings.logo_url} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                            ) : (
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <path d="M12 8a4 4 0 0 0-4 4" />
+                                    <circle cx="12" cy="12" r="2" />
+                                </svg>
+                            )}
                         </div>
                         <div className="dash-sidebar-brand-text">
-                            <span className="brand-name">Pilates Studio</span>
+                            <span className="brand-name">{settings.business_name}</span>
                             <span className="brand-role">Miembro</span>
                         </div>
                     </div>

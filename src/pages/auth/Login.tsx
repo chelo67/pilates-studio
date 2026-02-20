@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useNavigate, Link } from 'react-router-dom';
+import { useBranding } from '../../contexts/BrandingContext';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -9,6 +10,7 @@ const Login = () => {
     const [error, setError] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
+    const { settings } = useBranding();
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -48,7 +50,7 @@ const Login = () => {
                                 <line x1="16" y1="30" x2="32" y2="30" stroke="white" strokeWidth="1.5" opacity="0.4" />
                             </svg>
                         </div>
-                        <h1 className="auth-brand-title">Pilates Studio</h1>
+                        <h1 className="auth-brand-title">{settings.business_name}</h1>
                         <p className="auth-brand-subtitle">Tu espacio de bienestar y equilibrio</p>
                         <div className="auth-brand-features">
                             <div className="auth-feature">
