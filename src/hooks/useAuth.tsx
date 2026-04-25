@@ -55,12 +55,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 .from('profiles')
                 .select('*')
                 .eq('id', userId)
-                .single();
+                .maybeSingle();
 
             if (error) {
                 console.error('Error fetching profile:', error);
-            } else {
+            } else if (data) {
                 setProfile(data);
+            } else {
+                // Profile row doesn't exist — auto-create one as safety net
+                console.warn('Profile not found, attempting to auto-create...');
+                const { data: newProfile, error: insertError } = await supabase
+                    .from('profiles')
+                    .insert({ id: userId, role: 'member', tenant_id: 1 })
+                    .select()
+                    .single();
+
+                if (insertError) {
+                    console.error('Error auto-creating profile:', insertError);
+                } else {
+                    setProfile(newProfile);
+                }
             }
         } catch (error) {
             console.error('Error in fetchProfile:', error);

@@ -40,15 +40,19 @@ const Login = () => {
                 <div className="auth-brand-panel">
                     <div className="auth-brand-content">
                         <div className="auth-logo">
-                            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <circle cx="24" cy="24" r="22" stroke="white" strokeWidth="2.5" opacity="0.9" />
-                                <path d="M24 10C18 10 14 16 14 24C14 32 18 38 24 38" stroke="white" strokeWidth="2.5" strokeLinecap="round" opacity="0.7" />
-                                <path d="M24 10C30 10 34 16 34 24C34 32 30 38 24 38" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-                                <circle cx="24" cy="24" r="4" fill="white" opacity="0.9" />
-                                <line x1="16" y1="18" x2="32" y2="18" stroke="white" strokeWidth="1.5" opacity="0.4" />
-                                <line x1="15" y1="24" x2="33" y2="24" stroke="white" strokeWidth="1.5" opacity="0.4" />
-                                <line x1="16" y1="30" x2="32" y2="30" stroke="white" strokeWidth="1.5" opacity="0.4" />
-                            </svg>
+                            {settings.logo_url ? (
+                                <img src={settings.logo_url} alt={settings.business_name} className="auth-custom-logo" />
+                            ) : (
+                                <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="24" cy="24" r="22" stroke="white" strokeWidth="2.5" opacity="0.9" />
+                                    <path d="M24 10C18 10 14 16 14 24C14 32 18 38 24 38" stroke="white" strokeWidth="2.5" strokeLinecap="round" opacity="0.7" />
+                                    <path d="M24 10C30 10 34 16 34 24C34 32 30 38 24 38" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+                                    <circle cx="24" cy="24" r="4" fill="white" opacity="0.9" />
+                                    <line x1="16" y1="18" x2="32" y2="18" stroke="white" strokeWidth="1.5" opacity="0.4" />
+                                    <line x1="15" y1="24" x2="33" y2="24" stroke="white" strokeWidth="1.5" opacity="0.4" />
+                                    <line x1="16" y1="30" x2="32" y2="30" stroke="white" strokeWidth="1.5" opacity="0.4" />
+                                </svg>
+                            )}
                         </div>
                         <h1 className="auth-brand-title">{settings.business_name}</h1>
                         <p className="auth-brand-subtitle">Tu espacio de bienestar y equilibrio</p>
@@ -139,6 +143,11 @@ const Login = () => {
                                             </svg>
                                         )}
                                     </button>
+                                </div>
+                                <div className="auth-field-aux" style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '4px' }}>
+                                    <Link to="/forgot-password" style={{ fontSize: '0.8rem', color: 'var(--brand-primary)', fontWeight: '500', textDecoration: 'none' }}>
+                                        ¿Olvidaste tu contraseña?
+                                    </Link>
                                 </div>
                             </div>
 

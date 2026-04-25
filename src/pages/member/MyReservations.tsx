@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { format } from 'date-fns';
-import { Calendar, Clock, Users, LogOut, Menu, X } from 'lucide-react';
+import { Calendar, Clock, Users, LogOut, Menu, X, User } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useToast } from '../../components/ui/Toast';
 import { getCurrentTenantId } from '../../lib/tenant';
@@ -108,6 +108,16 @@ const MemberReservations = () => {
                         >
                             <div className="sidebar-icon"><Users size={18} /></div>
                             Mis Reservas
+                        </Link>
+
+                        <span className="dash-sidebar-label" style={{ marginTop: '1.25rem' }}>Mi Cuenta</span>
+                        <Link
+                            to="/profile"
+                            onClick={() => setIsSidebarOpen(false)}
+                            className={`dash-sidebar-item ${location.pathname === '/profile' ? 'active' : ''}`}
+                        >
+                            <div className="sidebar-icon"><User size={18} /></div>
+                            Mi Perfil
                         </Link>
                     </nav>
 
